@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="log_system"
+        android:label="Aijaz Log Book"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
