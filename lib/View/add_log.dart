@@ -9,6 +9,13 @@ class AddLogScreen extends StatefulWidget{
 }
 
 class AddLogScreenState extends State<AddLogScreen>{
+  final _formKey = GlobalKey<FormState>();
+  Future<void> _validateLog() async {
+    if (_formKey.currentState!.validate()) {
+
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -34,7 +41,18 @@ class AddLogScreenState extends State<AddLogScreen>{
                 }
                 return null;
               }
-            )
+            ),
+            const SizedBox(height: 20.0),
+            ElevatedButton(
+              onPressed: _validateLog,
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12.0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+              ),
+              child: const Text('Save', style: TextStyle(fontSize: 18.0)),
+            ),
 
 
           ],
