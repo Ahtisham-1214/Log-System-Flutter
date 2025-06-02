@@ -13,7 +13,56 @@ class AddLogScreenState extends State<AddLogScreen> {
   final _purposeController = TextEditingController();
   final _nameController = TextEditingController();
   final _dateController = TextEditingController();
-  final _timeController = TextEditingController();
+  final _timeFromController = TextEditingController();
+  final _timeToController = TextEditingController();
+  final _initialMeterReadingController = TextEditingController();
+  final _finalMeterReadingController = TextEditingController();
+  final _remarksController = TextEditingController();
+  final _kilometersCoveredController = TextEditingController();
+  bool _isCalculatingKilometers = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Add listeners to the initial and final meter reading controllers
+    _initialMeterReadingController.addListener(_calculateKilometersCovered);
+    _finalMeterReadingController.addListener(_calculateKilometersCovered);
+  }
+
+  void _calculateKilometersCovered() {
+    // If the kilometers covered field is currently being manually edited,
+    // or if we are already in the process of calculating, avoid recursion.
+    // This check is more relevant if _kilometersCoveredController also has a listener
+    // that might trigger this function, or if user can edit the km field.
+    // For now, simple check for _isCalculatingKilometers is enough.
+    if (_isCalculatingKilometers) return;
+    setState(() {
+      _isCalculatingKilometers = true; // Mark that calculation is in progress
+
+      final String initialText = _initialMeterReadingController.text;
+      final String finalText = _finalMeterReadingController.text;
+
+      final double? initialReading = double.tryParse(initialText);
+      final double? finalReading = double.tryParse(finalText);
+
+      if (initialReading != null && finalReading != null) {
+        if (finalReading >= initialReading) {
+          final double difference = finalReading - initialReading;
+          // Format to a reasonable number of decimal places, e.g., 2
+          _kilometersCoveredController.text = difference.toStringAsFixed(2);
+        } else {
+          // Handle invalid input, e.g., final reading is less than initial
+          // You could clear the field or show an error specific to this logic
+          _kilometersCoveredController.text = ""; // Or some error indicator like "Error"
+        }
+      } else {
+        // If one or both fields are not valid numbers, clear the kilometers field
+        _kilometersCoveredController.text = "";
+      }
+      _isCalculatingKilometers = false; // Calculation finished
+    });
+  }
+
 
   @override
   void dispose() {
@@ -21,7 +70,12 @@ class AddLogScreenState extends State<AddLogScreen> {
     _purposeController.dispose();
     _detailController.dispose();
     _dateController.dispose();
-    _timeController.dispose();
+    _timeFromController.dispose();
+    _timeToController.dispose();
+    _initialMeterReadingController.dispose();
+    _finalMeterReadingController.dispose();
+    _remarksController.dispose();
+    _kilometersCoveredController.dispose();
     super.dispose();
   }
 
@@ -153,10 +207,10 @@ class AddLogScreenState extends State<AddLogScreen> {
               ),
               const SizedBox(height: 20.0),
               TextFormField(
-                controller: _timeController,
+                controller: _timeFromController,
                 readOnly: true,
                 decoration: const InputDecoration(
-                  labelText: 'Time of Journey',
+                  labelText: 'Time from Journey',
                   prefixIcon: Icon(Icons.access_time_filled_sharp),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(10.0)),
@@ -170,7 +224,7 @@ class AddLogScreenState extends State<AddLogScreen> {
                     initialEntryMode: TimePickerEntryMode.input,
                   );
                   if (pickedTime != null) {
-                    _timeController.text = pickedTime.format(context);
+                    _timeFromController.text = pickedTime.format(context);
                   }
                 },
                 validator: (value) {
@@ -181,6 +235,126 @@ class AddLogScreenState extends State<AddLogScreen> {
                 },
               ),
               const SizedBox(height: 20.0),
+              TextFormField(
+                controller: _timeToController,
+                readOnly: true,
+                decoration: const InputDecoration(
+                  labelText: 'Time to Journey',
+                  prefixIcon: Icon(Icons.access_time_filled_sharp),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  ),
+                  floatingLabelBehavior: FloatingLabelBehavior.auto,
+                ),
+                onTap: () async {
+                  final TimeOfDay? pickedTime = await showTimePicker(
+                    context: context,
+                    initialTime: TimeOfDay.now(),
+                    initialEntryMode: TimePickerEntryMode.input,
+                  );
+                  if (pickedTime != null) {
+                    _timeToController.text = pickedTime.format(context);
+                  }
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the time to journey';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20.0),
+              TextFormField(
+                controller: _initialMeterReadingController,
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(
+                  labelText: 'Initial Meter Reading',
+                  prefixIcon: Icon(Icons.directions_car),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  ),
+                  floatingLabelBehavior: FloatingLabelBehavior.auto,
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the initial meter reading';
+                  }
+                  if (double.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20.0),
+              TextFormField(
+                controller: _finalMeterReadingController,
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                decoration: const InputDecoration(
+                  labelText: 'Final Meter Reading',
+                  prefixIcon: Icon(Icons.directions_car),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  ),
+                  floatingLabelBehavior: FloatingLabelBehavior.auto,
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the final meter reading';
+                  }
+                  if (double.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20.0),
+              TextFormField(
+                controller: _kilometersCoveredController,
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                readOnly: true,
+                decoration: const InputDecoration(
+                  labelText: 'Kilometers Covered',
+                  prefixIcon: Icon(Icons.directions_car),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  ),
+                  floatingLabelBehavior: FloatingLabelBehavior.auto,
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    if (_initialMeterReadingController.text.isNotEmpty &&
+                    _finalMeterReadingController.text.isNotEmpty){
+                      return "Invalid Meter reading";
+                    }
+                    return null;
+                  }
+                  if (double.tryParse(value) == null) {
+                    return 'Please enter a valid number';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20.0),
+              TextFormField(
+                controller: _remarksController,
+                keyboardType: TextInputType.text,
+                decoration: const InputDecoration(
+                  labelText: 'Remarks',
+                  prefixIcon: Icon(Icons.comment),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  ),
+                  floatingLabelBehavior: FloatingLabelBehavior.auto,
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter the Remarks';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20.0),
+
               ElevatedButton(
                 onPressed: _validateLog,
                 style: ElevatedButton.styleFrom(
