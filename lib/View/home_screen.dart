@@ -3,18 +3,6 @@ import 'package:flutter/material.dart';
 import 'add_log.dart';
 import 'view_log.dart';
 
-@override
-Widget build(BuildContext context) {
-  return MaterialApp(
-    title: 'Flutter Demo',
-    theme: ThemeData(
-
-      colorScheme: ColorScheme.fromSeed(seedColor: Colors.greenAccent),
-    ),
-    home: const HomeScreen(title: 'Welcome to Aror Log System'),
-  );
-}
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required this.title});
@@ -35,8 +23,7 @@ class _HomeScreen extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: Theme
             .of(context)
-            .colorScheme
-            .inversePrimary,
+            .primaryColor,
         title: Text(widget.title),
       ),
       body: Center(
