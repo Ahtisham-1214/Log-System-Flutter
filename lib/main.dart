@@ -19,7 +19,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Login App',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        useMaterial3: false,
+        primarySwatch: maroonSwatch,
         visualDensity: VisualDensity.adaptivePlatformDensity,
         fontFamily: 'Inter',
       ),
@@ -28,6 +29,21 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+const MaterialColor maroonSwatch = MaterialColor(
+  0xFF800000, // Maroon base color
+  <int, Color>{
+    50: Color(0xFFF2E6E6),
+    100: Color(0xFFDFC0C0),
+    200: Color(0xFFCC9999),
+    300: Color(0xFFB97373),
+    400: Color(0xFFA64D4D),
+    500: Color(0xFF800000), // Primary color
+    600: Color(0xFF730000),
+    700: Color(0xFF660000),
+    800: Color(0xFF590000),
+    900: Color(0xFF400000),
+  },
+);
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
