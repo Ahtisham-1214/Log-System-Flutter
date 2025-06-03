@@ -57,8 +57,6 @@ class LoginPageState extends State<LoginPage> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
-  String? _loginMessage;
-  Color _messageColor = Colors.red;
   final UserRepository _userRepository = UserRepository();
 
   @override
@@ -85,10 +83,7 @@ class LoginPageState extends State<LoginPage> {
         if (!mounted) return; // ✅ Ensure widget is still in tree
 
         if (isValid) {
-          setState(() {
-            _loginMessage = 'Login Successful!';
-            _messageColor = Colors.green;
-          });
+          _showMessage("Login Successful", Color(0xFF0E1B67));
           _formKey.currentState?.reset();
           _usernameController.clear();
           _passwordController.clear();
@@ -99,18 +94,63 @@ class LoginPageState extends State<LoginPage> {
             MaterialPageRoute(builder: (context) => HomeScreen(title: "Ahtisham")),
           );
         } else {
-          setState(() {
-            _loginMessage = 'Invalid username or password.';
-            _messageColor = Colors.red;
-          });
+          _showMessage("Invalid Credentials", Color(0xFFC12222));
         }
       } catch (e) {
-        setState(() {
-          _loginMessage = 'An error occurred: $e';
-          _messageColor = Colors.red;
-        });
+        _showMessage("An error occured $e", Color(0xFFC12222));
       }
     }
+  }
+
+  void _showMessage(String message, Color color) {
+    OverlayEntry? overlayEntry; // To keep track of the overlay entry
+
+    overlayEntry = OverlayEntry(
+      builder:
+          (context) => Positioned(
+        // Center the widget
+        top: MediaQuery.of(context).size.height / 2 - 300,
+        // Adjust 50 based on your card's approx height / 2
+        left: MediaQuery.of(context).size.width / 2 - 130,
+        // Adjust 150 based on your card's approx width / 2
+        child: Material(
+          // Material widget is needed for Card to have elevation and shape
+          color: Colors.transparent,
+          child: Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            color: color, // Your custom color
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 16.0,
+              ), // Adjusted padding
+              child: Text(
+                message,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16, // Ensure font size is reasonable
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    // Add the OverlayEntry to the Overlay
+    Overlay.of(context).insert(overlayEntry);
+
+    // Remove the OverlayEntry after a duration
+    Future.delayed(const Duration(seconds: 1), () {
+      if (overlayEntry != null && overlayEntry!.mounted) {
+        overlayEntry?.remove();
+        overlayEntry = null; // Clear the reference
+      }
+    });
   }
 
   @override
@@ -125,15 +165,15 @@ class LoginPageState extends State<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              if (_loginMessage != null)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10.0),
-                  child: Text(
-                    _loginMessage!,
-                    style: TextStyle(color: _messageColor, fontSize: 16),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
+              // if (_loginMessage != null)
+              //   Padding(
+              //     padding: const EdgeInsets.only(bottom: 10.0),
+              //     child: Text(
+              //       _loginMessage!,
+              //       style: TextStyle(color: _messageColor, fontSize: 16),
+              //       textAlign: TextAlign.center,
+              //     ),
+              //   ),
               TextFormField(
                 controller: _usernameController,
                 keyboardType: TextInputType.text,
