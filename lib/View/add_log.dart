@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:log_system/Model/log.dart';
+import 'package:log_system/Model/log_repository.dart';
 
 class AddLogScreen extends StatefulWidget {
   const AddLogScreen({super.key});
@@ -81,59 +83,85 @@ class AddLogScreenState extends State<AddLogScreen> {
 
   Future<void> _validateLog() async {
     if (_formKey.currentState!.validate()) {
-      _showMessage(context, "Log Added Successfully");
+      try{
+        final log = Log(
+          name: _nameController.text,
+          detail: _detailController.text,
+          purpose: _purposeController.text,
+          date: _dateController.text,
+          timeFrom: _timeFromController.text,
+          timeTo: _timeToController.text,
+          remarks: _remarksController.text,
+          initialMeterReading: double.parse(_initialMeterReadingController.text),
+          finalMeterReading: double.parse(_finalMeterReadingController.text),
+          kilometersCovered: double.parse(_kilometersCoveredController.text),
+        );
+        await LogRepository().insertLog(log);
+        _showMessage("Log Added Successfully", Color(0xFF0E1B67));
+
+      }catch(e){
+        _showMessage("$e", Color(0xFFC12222));
+      }
     }
   }
 
-  void _showMessage(BuildContext context, String message) {
-    OverlayEntry? overlayEntry; // To keep track of the overlay entry
+  void _showMessage(String message, Color color) {
+    OverlayEntry? overlayEntry;
 
     overlayEntry = OverlayEntry(
-      builder:
-          (context) => Positioned(
-            // Center the widget
-            top: MediaQuery.of(context).size.height / 2 - 300,
-            // Adjust 50 based on your card's approx height / 2
-            left: MediaQuery.of(context).size.width / 2 - 130,
-            // Adjust 150 based on your card's approx width / 2
-            child: Material(
-              // Material widget is needed for Card to have elevation and shape
-              color: Colors.transparent,
-              child: Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+      builder: (context) => SafeArea(
+        child: GestureDetector(
+          onTap: () {
+            overlayEntry?.remove();
+            overlayEntry = null;
+          },
+          child: Material(
+            color: Colors.black54, // semi-transparent background
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxWidth: 300,
                 ),
-                color: const Color(0xFF0E1B67), // Your custom color
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24.0,
-                    vertical: 16.0,
-                  ), // Adjusted padding
-                  child: Text(
-                    message,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16, // Ensure font size is reasonable
+                child: AnimatedOpacity(
+                  duration: const Duration(milliseconds: 300),
+                  opacity: 1.0,
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    textAlign: TextAlign.center,
+                    color: color,
+                    elevation: 10,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24.0, vertical: 18.0),
+                      child: Text(
+                        message,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                   ),
                 ),
               ),
             ),
           ),
+        ),
+      ),
     );
 
-    // Add the OverlayEntry to the Overlay
-    Overlay.of(context).insert(overlayEntry);
+    Overlay.of(context).insert(overlayEntry!);
 
-    // Remove the OverlayEntry after a duration
     Future.delayed(const Duration(seconds: 4), () {
       if (overlayEntry != null && overlayEntry!.mounted) {
         overlayEntry?.remove();
-        overlayEntry = null; // Clear the reference
+        overlayEntry = null;
       }
     });
+
   }
 
   @override
