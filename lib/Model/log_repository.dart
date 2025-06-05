@@ -34,4 +34,15 @@ class LogRepository {
       );
     });
   }
+
+  Future<double> getTotalKilometers() async {
+    final db = await _databaseHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query('logs');
+    late double totalKilometers = 0;
+    for (var map in maps) {
+      totalKilometers += map['kilometersCovered'];
+    }
+    return totalKilometers;
+
+  }
 }
