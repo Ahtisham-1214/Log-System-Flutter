@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:log_system/Model/log.dart';
 import 'package:log_system/Model/log_repository.dart';
+import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:csv/csv.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 
 class ViewLogScreen extends StatefulWidget {
   const ViewLogScreen({super.key});
@@ -86,6 +91,16 @@ class ViewLogScreenState extends State<ViewLogScreen> {
                           ],
                         ),
               ),
+      floatingActionButton:
+      _filteredLogs.isNotEmpty
+          ? FloatingActionButton.extended(
+        onPressed: () => _exportLogsToCSV(_filteredLogs),
+        icon: const Icon(Icons.share,),
+        backgroundColor: Colors.white,
+        foregroundColor: Color(0xFF97160A),
+        label: const Text('Export'),
+      )
+          : null,
     );
   }
 
@@ -242,5 +257,64 @@ class ViewLogScreenState extends State<ViewLogScreen> {
     return "${date.year.toString().padLeft(4, '0')}-"
         "${date.month.toString().padLeft(2, '0')}-"
         "${date.day.toString().padLeft(2, '0')}";
+  }
+
+  Future<void> _exportLogsToCSV(List<Log> logs) async {
+    final DateFormat formatter = DateFormat('yyyy-MM-dd');
+    String rangeLabel = '';
+
+    if (_selectedDateRange != null) {
+      String start = formatter.format(_selectedDateRange!.start);
+      String end = formatter.format(_selectedDateRange!.end);
+      rangeLabel = '_$start-to-$end';
+    }
+
+    List<List<dynamic>> rows = [];
+
+    // Header
+    rows.add(["Log Export${rangeLabel.isNotEmpty ? ' ($rangeLabel)' : ''}"]);
+    rows.add([]);
+
+    rows.add([
+      "ID", "Name", "Date", "Purpose", "Detail",
+      "Time From", "Time To", "Initial Meter", "Final Meter",
+      "Kilometers Covered", "Remarks"
+    ]);
+
+    for (var log in logs) {
+      rows.add([
+        log.id ?? '',
+        log.name,
+        log.date,
+        log.purpose,
+        log.detail,
+        log.timeFrom,
+        log.timeTo,
+        log.initialMeterReading,
+        log.finalMeterReading,
+        log.kilometersCovered,
+        log.remarks,
+      ]);
+    }
+
+    String csv = const ListToCsvConverter().convert(rows);
+    try {
+      // Save to temporary file
+      final tempDir = await getTemporaryDirectory();
+      final fileName = 'logs_export${rangeLabel.isNotEmpty ? '_$rangeLabel' : ''}.csv';
+      final file = File('${tempDir.path}/$fileName');
+      await file.writeAsString(csv);
+
+      // Share directly
+      await Share.shareXFiles(
+        [XFile(file.path)],
+        text: 'Exported Logs${rangeLabel.isNotEmpty ? ' ($rangeLabel)' : ''}',
+      );
+    } catch (e) {
+      debugPrint("Error exporting CSV: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to export logs.")),
+      );
+    }
   }
 }
