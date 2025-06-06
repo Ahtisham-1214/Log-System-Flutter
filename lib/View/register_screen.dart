@@ -43,46 +43,45 @@ class _RegisterPageState extends State<RegisterPage> {
     OverlayEntry? overlayEntry; // To keep track of the overlay entry
 
     overlayEntry = OverlayEntry(
-      builder:
-          (context) => Positioned(
-        // Center the widget
-        top: MediaQuery.of(context).size.height / 2 - 300,
-        // Adjust 50 based on your card's approx height / 2
-        left: MediaQuery.of(context).size.width / 2 - 130,
-        // Adjust 150 based on your card's approx width / 2
-        child: Material(
-          // Material widget is needed for Card to have elevation and shape
-          color: Colors.transparent,
-          child: Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            color: color, // Your custom color
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 24.0,
-                vertical: 16.0,
-              ), // Adjusted padding
-              child: Text(
-                message,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16, // Ensure font size is reasonable
+      builder: (context) => SafeArea(
+        child: Align(
+          alignment: Alignment.topCenter,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 80.0), // Distance from top
+            child: Material(
+              color: Colors.transparent,
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                textAlign: TextAlign.center,
+                color: color,
+                elevation: 6,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24.0,
+                    vertical: 16.0,
+                  ),
+                  child: Text(
+                    message,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
               ),
             ),
           ),
         ),
       ),
     );
-
     // Add the OverlayEntry to the Overlay
     Overlay.of(context).insert(overlayEntry);
 
     // Remove the OverlayEntry after a duration
-    Future.delayed(const Duration(seconds: 4), () {
+    Future.delayed(const Duration(seconds: 1), () {
       if (overlayEntry != null && overlayEntry!.mounted) {
         overlayEntry?.remove();
         overlayEntry = null; // Clear the reference
