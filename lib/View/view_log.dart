@@ -92,15 +92,15 @@ class ViewLogScreenState extends State<ViewLogScreen> {
                         ),
               ),
       floatingActionButton:
-      _filteredLogs.isNotEmpty
-          ? FloatingActionButton.extended(
-        onPressed: () => _exportLogsToCSV(_filteredLogs),
-        icon: const Icon(Icons.share,),
-        backgroundColor: Colors.white,
-        foregroundColor: Color(0xFF97160A),
-        label: const Text('Export'),
-      )
-          : null,
+          _filteredLogs.isNotEmpty
+              ? FloatingActionButton.extended(
+                onPressed: () => _exportLogsToCSV(_filteredLogs),
+                icon: const Icon(Icons.share),
+                backgroundColor: Colors.white,
+                foregroundColor: Color(0xFF97160A),
+                label: const Text('Export'),
+              )
+              : null,
     );
   }
 
@@ -276,9 +276,17 @@ class ViewLogScreenState extends State<ViewLogScreen> {
     rows.add([]);
 
     rows.add([
-      "ID", "Name", "Date", "Purpose", "Detail",
-      "Time From", "Time To", "Initial Meter", "Final Meter",
-      "Kilometers Covered", "Remarks"
+      "ID",
+      "Name",
+      "Date",
+      "Purpose",
+      "Detail",
+      "Time From",
+      "Time To",
+      "Initial Meter",
+      "Final Meter",
+      "Kilometers Covered",
+      "Remarks",
     ]);
 
     for (var log in logs) {
@@ -301,20 +309,22 @@ class ViewLogScreenState extends State<ViewLogScreen> {
     try {
       // Save to temporary file
       final tempDir = await getTemporaryDirectory();
-      final fileName = 'logs_export${rangeLabel.isNotEmpty ? '_$rangeLabel' : ''}.csv';
+      final fileName =
+          'logs_export${rangeLabel.isNotEmpty ? '_$rangeLabel' : ''}.csv';
       final file = File('${tempDir.path}/$fileName');
       await file.writeAsString(csv);
 
       // Share directly
-      await Share.shareXFiles(
-        [XFile(file.path)],
-        text: 'Exported Logs${rangeLabel.isNotEmpty ? ' ($rangeLabel)' : ''}',
-      );
+      await Share.shareXFiles([
+        XFile(file.path),
+      ], text: 'Exported Logs${rangeLabel.isNotEmpty ? ' ($rangeLabel)' : ''}');
     } catch (e) {
       debugPrint("Error exporting CSV: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to export logs.")),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text("Failed to export logs.")));
+      }
     }
   }
 }
