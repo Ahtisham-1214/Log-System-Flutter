@@ -84,7 +84,6 @@ class LoginPageState extends State<LoginPage> {
         if (!mounted) return; // ✅ Ensure widget is still in tree
 
         if (isValid) {
-          _showMessage("Login Successful", Color(0xFF0E1B67));
           _formKey.currentState?.reset();
           _usernameController.clear();
           _passwordController.clear();
@@ -93,14 +92,14 @@ class LoginPageState extends State<LoginPage> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => HomeScreen(title: "Ahtisham"),
+              builder: (context) => HomeScreen(title: "Home"),
             ),
           );
         } else {
           _showMessage("Invalid Credentials", Color(0xFFC12222));
         }
       } catch (e) {
-        _showMessage("An error occured $e", Color(0xFFC12222));
+        _showMessage("An error occurred $e", Color(0xFFC12222));
       }
     }
   }
