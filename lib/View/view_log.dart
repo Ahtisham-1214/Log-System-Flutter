@@ -93,15 +93,14 @@ class ViewLogScreenState extends State<ViewLogScreen> {
               ),
       floatingActionButton:
           _filteredLogs.isNotEmpty
-              ? IconButton(
+              ? FloatingActionButton(
                 onPressed: () => _exportLogsToCSV(_filteredLogs),
-                icon: Icon(
+                backgroundColor: Colors.white,
+                child: Icon(
                     Icons.share,
-                    color: Colors.white,
-                    size: 30),
-                // backgroundColor: Colors.white,
-                // foregroundColor: Color(0xFF97160A),
-                // label: const Text('Export'),
+                    color: Color(0xFF97160A),
+                    size: 26,
+                ),
               )
               : null,
     );
@@ -197,9 +196,36 @@ class ViewLogScreenState extends State<ViewLogScreen> {
                 ),
               Row(children: [
                 const Spacer(),
-                IconButton(onPressed: () {},
-                    icon: Icon(Icons.more_vert, color: Colors.grey, size: 30)),
-                // const SizedBox(width: 30),
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.more_vert, color: Colors.grey, size: 30),
+                  onSelected: (value) {
+                    switch (value) {
+                      case 'edit':
+                      // TODO: Implement edit functionality
+                        break;
+                      case 'delete':
+                      // TODO: Implement delete functionality
+                        break;
+                    // Add more cases as needed
+                      case 'share':
+                        break;
+                    }
+                  },
+                  itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                    const PopupMenuItem<String>(
+                      value: 'edit',
+                      child: Text('Edit'),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: 'delete',
+                      child: Text('Delete'),
+                    ),
+                    const PopupMenuItem<String>(
+                      value: 'share',
+                      child: Text('Share'),
+                    ),
+                  ],
+                )
               ],
               )
             ],
