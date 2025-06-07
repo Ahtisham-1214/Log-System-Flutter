@@ -93,12 +93,15 @@ class ViewLogScreenState extends State<ViewLogScreen> {
               ),
       floatingActionButton:
           _filteredLogs.isNotEmpty
-              ? FloatingActionButton.extended(
+              ? IconButton(
                 onPressed: () => _exportLogsToCSV(_filteredLogs),
-                icon: const Icon(Icons.share),
-                backgroundColor: Colors.white,
-                foregroundColor: Color(0xFF97160A),
-                label: const Text('Export'),
+                icon: Icon(
+                    Icons.share,
+                    color: Colors.white,
+                    size: 30),
+                // backgroundColor: Colors.white,
+                // foregroundColor: Color(0xFF97160A),
+                // label: const Text('Export'),
               )
               : null,
     );
@@ -192,6 +195,13 @@ class ViewLogScreenState extends State<ViewLogScreen> {
                     ],
                   ),
                 ),
+              Row(children: [
+                const Spacer(),
+                IconButton(onPressed: () {},
+                    icon: Icon(Icons.more_vert, color: Colors.grey, size: 30)),
+                // const SizedBox(width: 30),
+              ],
+              )
             ],
           ),
         ),
