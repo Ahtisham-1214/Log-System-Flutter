@@ -6,7 +6,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:csv/csv.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-
+import 'package:excel/excel.dart';
 class ViewLogScreen extends StatefulWidget {
   const ViewLogScreen({super.key});
 
@@ -94,7 +94,7 @@ class ViewLogScreenState extends State<ViewLogScreen> {
       floatingActionButton:
           _filteredLogs.isNotEmpty
               ? FloatingActionButton(
-                onPressed: () => _exportLogsToCSV(_filteredLogs),
+                onPressed: () => _exportLogsToExcel(_filteredLogs),
                 backgroundColor: Colors.white,
                 child: Icon(
                     Icons.share,
@@ -295,7 +295,7 @@ class ViewLogScreenState extends State<ViewLogScreen> {
         "${date.day.toString().padLeft(2, '0')}";
   }
 
-  Future<void> _exportLogsToCSV(List<Log> logs) async {
+  Future<void> _exportLogsToExcel(List<Log> logs) async {
     final DateFormat formatter = DateFormat('yyyy-MM-dd');
     String rangeLabel = '';
 
@@ -305,13 +305,16 @@ class ViewLogScreenState extends State<ViewLogScreen> {
       rangeLabel = '_$start-to-$end';
     }
 
-    List<List<dynamic>> rows = [];
+    final excel = Excel.createExcel();
+    final Sheet sheet = excel['Logs'];
 
-    // Header
-    rows.add(["Log Export${rangeLabel.isNotEmpty ? ' ($rangeLabel)' : ''}"]);
-    rows.add([]);
 
-    rows.add([
+    // Add a title row
+    sheet.appendRow(["Log Export${rangeLabel.isNotEmpty ? ' ($rangeLabel)' : ''}"]);
+    sheet.appendRow([]); // Empty row for spacing
+
+    // Add header row
+    sheet.appendRow([
       "ID",
       "Name",
       "Date",
@@ -325,8 +328,9 @@ class ViewLogScreenState extends State<ViewLogScreen> {
       "Remarks",
     ]);
 
+    // Add data rows
     for (var log in logs) {
-      rows.add([
+      sheet.appendRow([
         log.id ?? '',
         log.name,
         log.date,
@@ -341,25 +345,23 @@ class ViewLogScreenState extends State<ViewLogScreen> {
       ]);
     }
 
-    String csv = const ListToCsvConverter().convert(rows);
     try {
-      // Save to temporary file
+      final excelData = excel.encode();
       final tempDir = await getTemporaryDirectory();
-      final fileName =
-          'logs_export${rangeLabel.isNotEmpty ? '_$rangeLabel' : ''}.csv';
+      final fileName = 'logs_export${rangeLabel.isNotEmpty ? '_$rangeLabel' : ''}.xlsx';
       final file = File('${tempDir.path}/$fileName');
-      await file.writeAsString(csv);
+      await file.writeAsBytes(excelData!, flush: true);
 
-      // Share directly
-      await Share.shareXFiles([
-        XFile(file.path),
-      ], text: 'Exported Logs${rangeLabel.isNotEmpty ? ' ($rangeLabel)' : ''}');
+      await Share.shareXFiles(
+        [XFile(file.path)],
+        text: 'Exported Logs${rangeLabel.isNotEmpty ? ' ($rangeLabel)' : ''}',
+      );
     } catch (e) {
-      debugPrint("Error exporting CSV: $e");
+      debugPrint("Error exporting XLSX: $e");
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text("Failed to export logs.")));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Failed to export Excel file.")),
+        );
       }
     }
   }
