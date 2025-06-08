@@ -7,6 +7,7 @@ import 'package:csv/csv.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:excel/excel.dart';
+import 'dart:convert';
 class ViewLogScreen extends StatefulWidget {
   const ViewLogScreen({super.key});
 
@@ -208,6 +209,7 @@ class ViewLogScreenState extends State<ViewLogScreen> {
                         break;
                     // Add more cases as needed
                       case 'share':
+                        _exportSpecificLogs(log.id!);
                         break;
                     }
                   },
@@ -293,6 +295,50 @@ class ViewLogScreenState extends State<ViewLogScreen> {
     return "${date.year.toString().padLeft(4, '0')}-"
         "${date.month.toString().padLeft(2, '0')}-"
         "${date.day.toString().padLeft(2, '0')}";
+  }
+
+  Future<void> _exportSpecificLogs(int id) async {
+    try {
+      var specificLog = {};
+      for (var log in _logs) {
+        if (log.id == id) {
+          specificLog['Id'] = log.id;
+          specificLog['Name'] = log.name;
+          specificLog['Date'] = log.date;
+          specificLog['Purpose'] = log.purpose;
+          specificLog['Detail'] = log.detail;
+          specificLog['Time From'] = log.timeFrom;
+          specificLog['Time To'] = log.timeTo;
+          specificLog['Initial Meter Reading'] = log.initialMeterReading;
+          specificLog['Final Meter Reading'] = log.finalMeterReading;
+          specificLog['Kilometers Covered'] = log.kilometersCovered;
+          specificLog['Remarks'] = log.remarks;
+          break;
+        }
+      }
+      if (specificLog.isNotEmpty) {
+        String logString = jsonEncode(specificLog);
+        logString = logString.replaceAll("\"", "");
+        logString = logString.replaceAll(":", ": ");
+        logString = logString.replaceAll("{", "");
+        logString = logString.replaceAll("}", "");
+        logString = logString.replaceAll(",", "\n");
+        Share.share(logString);
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Log not found.")),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint("Error exporting log: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Failed to export log.")),
+        );
+      }
+    }
   }
 
   Future<void> _exportLogsToExcel(List<Log> logs) async {
