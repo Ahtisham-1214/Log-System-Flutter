@@ -55,7 +55,8 @@ class AddLogScreenState extends State<AddLogScreen> {
         } else {
           // Handle invalid input, e.g., final reading is less than initial
           // You could clear the field or show an error specific to this logic
-          _kilometersCoveredController.text = ""; // Or some error indicator like "Error"
+          _kilometersCoveredController.text =
+              ""; // Or some error indicator like "Error"
         }
       } else {
         // If one or both fields are not valid numbers, clear the kilometers field
@@ -64,7 +65,6 @@ class AddLogScreenState extends State<AddLogScreen> {
       _isCalculatingKilometers = false; // Calculation finished
     });
   }
-
 
   @override
   void dispose() {
@@ -83,7 +83,7 @@ class AddLogScreenState extends State<AddLogScreen> {
 
   Future<void> _validateLog() async {
     if (_formKey.currentState!.validate()) {
-      try{
+      try {
         final log = Log(
           name: _nameController.text,
           detail: _detailController.text,
@@ -92,14 +92,15 @@ class AddLogScreenState extends State<AddLogScreen> {
           timeFrom: _timeFromController.text,
           timeTo: _timeToController.text,
           remarks: _remarksController.text,
-          initialMeterReading: double.parse(_initialMeterReadingController.text),
+          initialMeterReading: double.parse(
+            _initialMeterReadingController.text,
+          ),
           finalMeterReading: double.parse(_finalMeterReadingController.text),
           kilometersCovered: double.parse(_kilometersCoveredController.text),
         );
         await LogRepository().insertLog(log);
         _showMessage("Log Added Successfully", Color(0xFF0E1B67));
-
-      }catch(e){
+      } catch (e) {
         _showMessage("$e", Color(0xFFC12222));
       }
     }
@@ -109,39 +110,42 @@ class AddLogScreenState extends State<AddLogScreen> {
     OverlayEntry? overlayEntry;
 
     overlayEntry = OverlayEntry(
-      builder: (context) => SafeArea(
-        child: GestureDetector(
-          onTap: () {
-            overlayEntry?.remove();
-            overlayEntry = null;
-          },
-          child: Material(
-            color: Colors.black54, // semi-transparent background
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxWidth: 300,
-                ),
-                child: AnimatedOpacity(
-                  duration: const Duration(milliseconds: 300),
-                  opacity: 1.0,
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    color: color,
-                    elevation: 10,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 24.0, vertical: 18.0),
-                      child: Text(
-                        message,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 16,
+      builder:
+          (context) => SafeArea(
+            child: GestureDetector(
+              onTap: () {
+                overlayEntry?.remove();
+                overlayEntry = null;
+              },
+              child: Material(
+                color: Colors.black54, // semi-transparent background
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 300),
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 300),
+                      opacity: 1.0,
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
                         ),
-                        textAlign: TextAlign.center,
+                        color: color,
+                        elevation: 10,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24.0,
+                            vertical: 18.0,
+                          ),
+                          child: Text(
+                            message,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 16,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -149,8 +153,6 @@ class AddLogScreenState extends State<AddLogScreen> {
               ),
             ),
           ),
-        ),
-      ),
     );
 
     Overlay.of(context).insert(overlayEntry!);
@@ -161,7 +163,6 @@ class AddLogScreenState extends State<AddLogScreen> {
         overlayEntry = null;
       }
     });
-
   }
 
   @override
@@ -174,258 +175,256 @@ class AddLogScreenState extends State<AddLogScreen> {
           key: _formKey,
           child: Padding(
             padding: const EdgeInsets.all(20.0),
-          child: Column(
-            children: <Widget>[
-              TextFormField(
-                controller: _nameController,
-                keyboardType: TextInputType.text,
-                decoration: const InputDecoration(
-                  labelText: 'Name of Official',
-                  prefixIcon: Icon(Icons.person),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
+            child: Column(
+              children: <Widget>[
+                TextFormField(
+                  controller: _nameController,
+                  keyboardType: TextInputType.text,
+                  decoration: const InputDecoration(
+                    labelText: 'Name of Official',
+                    prefixIcon: Icon(Icons.person),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                    ),
+                    floatingLabelBehavior: FloatingLabelBehavior.auto,
                   ),
-                  floatingLabelBehavior: FloatingLabelBehavior.auto,
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter the name of official';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20.0),
-              TextFormField(
-                controller: _detailController,
-                keyboardType: TextInputType.text,
-                decoration: const InputDecoration(
-                  labelText: 'Detail of Journey',
-                  prefixIcon: Icon(Icons.description),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                  ),
-                  floatingLabelBehavior: FloatingLabelBehavior.auto,
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter the detail of journey';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20.0),
-              TextFormField(
-                controller: _purposeController,
-                keyboardType: TextInputType.text,
-                decoration: const InputDecoration(
-                  labelText: 'Purpose of Journey',
-                  prefixIcon: Icon(Icons.description),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                  ),
-                  floatingLabelBehavior: FloatingLabelBehavior.auto,
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter the purpose of journey';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20.0),
-              TextFormField(
-                controller: _dateController,
-                readOnly: true,
-                decoration: const InputDecoration(
-                  labelText: 'Date of Journey',
-                  prefixIcon: Icon(Icons.date_range),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                  ),
-                  floatingLabelBehavior: FloatingLabelBehavior.auto,
-                ),
-                onTap: () async {
-                  DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2100),
-                  );
-                  if (pickedDate != null) {
-                    _dateController.text =
-                        "${pickedDate.toLocal()}".split(' ')[0];
-                  }
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter the date of journey';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20.0),
-              TextFormField(
-                controller: _timeFromController,
-                readOnly: true,
-                decoration: const InputDecoration(
-                  labelText: 'Time from Journey',
-                  prefixIcon: Icon(Icons.access_time_filled_sharp),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                  ),
-                  floatingLabelBehavior: FloatingLabelBehavior.auto,
-                ),
-                onTap: () async {
-                  final TimeOfDay? pickedTime = await showTimePicker(
-                    context: context,
-                    initialTime: TimeOfDay.now(),
-                    initialEntryMode: TimePickerEntryMode.input,
-                  );
-                  if (pickedTime != null) {
-                    _timeFromController.text = pickedTime.format(context);
-                  }
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter the time of journey';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20.0),
-              TextFormField(
-                controller: _timeToController,
-                readOnly: true,
-                decoration: const InputDecoration(
-                  labelText: 'Time to Journey',
-                  prefixIcon: Icon(Icons.access_time_filled_sharp),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                  ),
-                  floatingLabelBehavior: FloatingLabelBehavior.auto,
-                ),
-                onTap: () async {
-                  final TimeOfDay? pickedTime = await showTimePicker(
-                    context: context,
-                    initialTime: TimeOfDay.now(),
-                    initialEntryMode: TimePickerEntryMode.input,
-                  );
-                  if (pickedTime != null) {
-                    _timeToController.text = pickedTime.format(context);
-                  }
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter the time to journey';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20.0),
-              TextFormField(
-                controller: _initialMeterReadingController,
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                decoration: const InputDecoration(
-                  labelText: 'Initial Meter Reading',
-                  prefixIcon: Icon(Icons.directions_car),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                  ),
-                  floatingLabelBehavior: FloatingLabelBehavior.auto,
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter the initial meter reading';
-                  }
-                  if (double.tryParse(value) == null) {
-                    return 'Please enter a valid number';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20.0),
-              TextFormField(
-                controller: _finalMeterReadingController,
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                decoration: const InputDecoration(
-                  labelText: 'Final Meter Reading',
-                  prefixIcon: Icon(Icons.directions_car),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                  ),
-                  floatingLabelBehavior: FloatingLabelBehavior.auto,
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter the final meter reading';
-                  }
-                  if (double.tryParse(value) == null) {
-                    return 'Please enter a valid number';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20.0),
-              TextFormField(
-                controller: _kilometersCoveredController,
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                readOnly: true,
-                decoration: const InputDecoration(
-                  labelText: 'Kilometers Covered',
-                  prefixIcon: Icon(Icons.directions_car),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                  ),
-                  floatingLabelBehavior: FloatingLabelBehavior.auto,
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    if (_initialMeterReadingController.text.isNotEmpty &&
-                    _finalMeterReadingController.text.isNotEmpty){
-                      return "Invalid Meter reading";
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the name of official';
                     }
                     return null;
-                  }
-                  if (double.tryParse(value) == null) {
-                    return 'Please enter a valid number';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20.0),
-              TextFormField(
-                controller: _remarksController,
-                keyboardType: TextInputType.text,
-                decoration: const InputDecoration(
-                  labelText: 'Remarks',
-                  prefixIcon: Icon(Icons.comment),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                  ),
-                  floatingLabelBehavior: FloatingLabelBehavior.auto,
+                  },
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter the Remarks';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20.0),
+                const SizedBox(height: 20.0),
+                TextFormField(
+                  controller: _detailController,
+                  keyboardType: TextInputType.text,
+                  decoration: const InputDecoration(
+                    labelText: 'Detail of Journey',
+                    prefixIcon: Icon(Icons.description),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                    ),
+                    floatingLabelBehavior: FloatingLabelBehavior.auto,
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the detail of journey';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20.0),
+                TextFormField(
+                  controller: _purposeController,
+                  keyboardType: TextInputType.text,
+                  decoration: const InputDecoration(
+                    labelText: 'Purpose of Journey',
+                    prefixIcon: Icon(Icons.description),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                    ),
+                    floatingLabelBehavior: FloatingLabelBehavior.auto,
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the purpose of journey';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20.0),
+                TextFormField(
+                  controller: _dateController,
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Date of Journey',
+                    prefixIcon: Icon(Icons.date_range),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                    ),
+                    floatingLabelBehavior: FloatingLabelBehavior.auto,
+                  ),
+                  onTap: () async {
+                    DateTime? pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2100),
+                    );
+                    if (pickedDate != null) {
+                      _dateController.text =
+                          "${pickedDate.toLocal()}".split(' ')[0];
+                    }
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the date of journey';
+                    }
+                    if (DateTime.tryParse(value) == null ||
+                        DateTime.parse(value).isAfter(DateTime.now())) {
+                      return 'Please enter a valid date';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20.0),
+                TextFormField(
+                  controller: _timeFromController,
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Time from Journey',
+                    prefixIcon: Icon(Icons.access_time_filled_sharp),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                    ),
+                    floatingLabelBehavior: FloatingLabelBehavior.auto,
+                  ),
+                  onTap: () async {
+                    final TimeOfDay? pickedTime = await showTimePicker(
+                      context: context,
+                      initialTime: TimeOfDay.now(),
+                      initialEntryMode: TimePickerEntryMode.input,
+                    );
+                    if (pickedTime != null) {
+                      _timeFromController.text = pickedTime.format(context);
+                    }
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the time of journey';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20.0),
+                TextFormField(
+                  controller: _timeToController,
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Time to Journey',
+                    prefixIcon: Icon(Icons.access_time_filled_sharp),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                    ),
+                    floatingLabelBehavior: FloatingLabelBehavior.auto,
+                  ),
+                  onTap: () async {
+                    final TimeOfDay? pickedTime = await showTimePicker(
+                      context: context,
+                      initialTime: TimeOfDay.now(),
+                      initialEntryMode: TimePickerEntryMode.input,
+                    );
+                    if (pickedTime != null) {
+                      _timeToController.text = pickedTime.format(context);
+                    }
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the time to journey';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20.0),
+                TextFormField(
+                  controller: _initialMeterReadingController,
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  decoration: const InputDecoration(
+                    labelText: 'Initial Meter Reading',
+                    prefixIcon: Icon(Icons.directions_car),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                    ),
+                    floatingLabelBehavior: FloatingLabelBehavior.auto,
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the initial meter reading';
+                    }
+                    if (double.tryParse(value) == null) {
+                      return 'Please enter a valid number';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20.0),
+                TextFormField(
+                  controller: _finalMeterReadingController,
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  decoration: const InputDecoration(
+                    labelText: 'Final Meter Reading',
+                    prefixIcon: Icon(Icons.directions_car),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                    ),
+                    floatingLabelBehavior: FloatingLabelBehavior.auto,
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter the final meter reading';
+                    }
+                    if (double.tryParse(value) == null) {
+                      return 'Please enter a valid number';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20.0),
+                TextFormField(
+                  controller: _kilometersCoveredController,
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Kilometers Covered',
+                    prefixIcon: Icon(Icons.directions_car),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                    ),
+                    floatingLabelBehavior: FloatingLabelBehavior.auto,
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      if (_initialMeterReadingController.text.isNotEmpty &&
+                          _finalMeterReadingController.text.isNotEmpty) {
+                        return "Invalid Meter reading";
+                      }
+                      return null;
+                    }
+                    if (double.tryParse(value) == null) {
+                      return 'Please enter a valid number';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20.0),
+                TextFormField(
+                  controller: _remarksController,
+                  keyboardType: TextInputType.text,
+                  decoration: const InputDecoration(
+                    labelText: 'Remarks',
+                    prefixIcon: Icon(Icons.comment),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                    ),
+                    floatingLabelBehavior: FloatingLabelBehavior.auto,
+                  ),
+                ),
+                const SizedBox(height: 20.0),
 
-              ElevatedButton(
-                onPressed: _validateLog,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 12.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+                ElevatedButton(
+                  onPressed: _validateLog,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
                   ),
+                  child: const Text('Save', style: TextStyle(fontSize: 18.0)),
                 ),
-                child: const Text('Save', style: TextStyle(fontSize: 18.0)),
-              ),
-            ],
+              ],
+            ),
           ),
-          )
         ),
       ),
     );
