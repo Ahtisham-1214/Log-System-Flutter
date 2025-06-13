@@ -5,7 +5,7 @@ class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
 
   @override
-  _RegisterPageState createState() => _RegisterPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
 class _RegisterPageState extends State<RegisterPage> {
@@ -13,19 +13,22 @@ class _RegisterPageState extends State<RegisterPage> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final UserRepository _userRepository = UserRepository();
+  final List<String> _roles = ['Admin', 'Driver'];
+  String? _selectedRole = "Driver";
 
 
   Future<void> _register() async {
     if (_formKey.currentState!.validate()) {
       final username = _usernameController.text;
       final password = _passwordController.text;
+      final role = _selectedRole ?? 'Driver';
 
       try {
         final existingUser = await _userRepository.getUserByUsername(username);
         if (existingUser != null) {
           _showMessage("Username already exists", Color(0xFFC12222));
         } else {
-          await _userRepository.insertUser(User(userName: username, password: password));
+          await _userRepository.insertUser(User(userName: username, password: password, role: role));
           _showMessage("Registration Successful", Color(0xFF0E1B67));
           // Optionally navigate back to login:
           Future.delayed(const Duration(seconds: 2), () {
@@ -119,6 +122,32 @@ class _RegisterPageState extends State<RegisterPage> {
                 validator: (value) {
                   if (value == null || value.length < 3) {
                     return 'Password must be at least 3 characters';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 20),
+              DropdownButtonFormField<String>(
+                value: _selectedRole, // The currently selected value
+                decoration: const InputDecoration(
+                  labelText: 'Role',
+                  border: OutlineInputBorder(),
+                ),
+                hint: const Text('Select a role'), // Placeholder text
+                items: _roles.map((String role) {
+                  return DropdownMenuItem<String>(
+                    value: role,
+                    child: Text(role),
+                  );
+                }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedRole = newValue;
+                  });
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select a user role';
                   }
                   return null;
                 },
