@@ -4,14 +4,16 @@ import 'package:log_system/View/register_screen.dart';
 import 'package:log_system/main.dart';
 import 'add_log.dart';
 import 'view_log.dart';
+import 'package:log_system/Model/user.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key, required this.title});
+  const HomeScreen({super.key, required this.title, required this.user});
 
   final String title;
+  final User user;
 
   @override
-  _HomeScreen createState() => _HomeScreen();
+  State<HomeScreen> createState() => _HomeScreen();
 }
 
 class _HomeScreen extends State<HomeScreen> {
@@ -47,7 +49,6 @@ class _HomeScreen extends State<HomeScreen> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     double progress = (_totalKm / _targetKm).clamp(0.0, 1.0);
@@ -73,8 +74,31 @@ class _HomeScreen extends State<HomeScreen> {
               leading: const Icon(Icons.person_add),
               title: const Text('Register'),
               onTap: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const RegisterPage()));
+                if (widget.user.role == "Admin") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const RegisterPage(),
+                    ),
+                  );
+                } else {
+                  showDialog(
+                    context: context,
+                    builder:
+                        (context) => AlertDialog(
+                          title: const Text('Permission Denied'),
+                          content: const Text(
+                            'Only admins can access this feature',
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('OK'),
+                            ),
+                          ],
+                        ),
+                  );
+                }
               },
             ),
 
@@ -82,79 +106,99 @@ class _HomeScreen extends State<HomeScreen> {
               leading: const Icon(Icons.logout),
               title: const Text('Logout'),
               onTap: () {
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => MyApp()));
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyApp()),
+                );
               },
             ),
           ],
         ),
       ),
       body: Center(
-        child: _isLoading
-            ? const CircularProgressIndicator()
-            : Column(
-          children: [
-            Card(
-              elevation: 4,
-              margin: const EdgeInsets.all(20),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
+        child:
+            _isLoading
+                ? const CircularProgressIndicator()
+                : Column(
                   children: [
-                    Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        SizedBox(
-                          width: 150,
-                          height: 150,
-                          child: CircularProgressIndicator(
-                            value: progress,
-                            strokeWidth: 12,
-                            backgroundColor: Colors.grey[300],
-                            valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF97160A)),
-                          ),
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                    Card(
+                      elevation: 4,
+                      margin: const EdgeInsets.all(20),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
                           children: [
-                            Text(
-                              formatKilometers(_totalKm),
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF97160A),
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            const Text(
-                              'Total Covered',
-                              style: TextStyle(fontSize: 16, color: Color(0xFF97160A)),
+                            Stack(
+                              alignment: Alignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 150,
+                                  height: 150,
+                                  child: CircularProgressIndicator(
+                                    value: progress,
+                                    strokeWidth: 12,
+                                    backgroundColor: Colors.grey[300],
+                                    valueColor:
+                                        const AlwaysStoppedAnimation<Color>(
+                                          Color(0xFF97160A),
+                                        ),
+                                  ),
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      formatKilometers(_totalKm),
+                                      style: const TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF97160A),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    const Text(
+                                      'Total Covered',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Color(0xFF97160A),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    ElevatedButton.icon(
+                      icon: const Icon(Icons.grid_view),
+                      label: const Text("View Log"),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ViewLogScreen(),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size(double.infinity, 50),
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.grid_view),
-              label: const Text("View Log"),
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) => const ViewLogScreen()));
-              },
-              style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 50)),
-            ),
-          ],
-        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const AddLogScreen()))
-              .then((_) => _loadData()); // Refresh after adding a log
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const AddLogScreen()),
+          ).then((_) => _loadData()); // Refresh after adding a log
         },
         tooltip: 'Add Log',
         child: const Icon(Icons.add),
