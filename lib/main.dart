@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:log_system/Model/user_repository.dart';
 import 'package:log_system/Model/database_helper.dart';
-import 'View/register_screen.dart';
 import 'View/home_screen.dart';
 
 void main() async {
@@ -227,17 +226,6 @@ class LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 child: const Text('Login', style: TextStyle(fontSize: 18.0)),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const RegisterPage(),
-                    ),
-                  );
-                },
-                child: const Text('Don\'t have an account? Register here'),
               ),
             ],
           ),
