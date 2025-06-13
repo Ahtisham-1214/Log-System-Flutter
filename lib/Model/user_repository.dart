@@ -36,7 +36,7 @@ class UserRepository {
   }
 
   // Validate user credentials
-  Future<bool> validateUser(String username, String password) async {
+  Future<User?> validateUser(String username, String password) async {
     final db = await _databaseHelper.database;
     List<Map<String, dynamic>> maps = await db.query(
       'users',
@@ -44,7 +44,10 @@ class UserRepository {
       whereArgs: [username, password],
       limit: 1,
     );
-    return maps.isNotEmpty; // If a match is found, maps will not be empty
+    if (maps.isNotEmpty) {
+      return User.fromMap(maps.first);
+    }
+    return null; // If a match is found, maps will not be empty
   }
 
   // Get all users (for testing/admin purposes)
