@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:log_system/Model/user_repository.dart';
 import 'package:log_system/Model/database_helper.dart';
+import 'Model/user.dart';
 import 'View/home_screen.dart';
 
 void main() async {
@@ -78,11 +79,11 @@ class LoginPageState extends State<LoginPage> {
       String password = _passwordController.text;
 
       try {
-        bool isValid = await _userRepository.validateUser(username, password);
+        User? user = await _userRepository.validateUser(username, password);
 
         if (!mounted) return; // ✅ Ensure widget is still in tree
 
-        if (isValid) {
+        if (user != null) {
           _formKey.currentState?.reset();
           _usernameController.clear();
           _passwordController.clear();
@@ -90,7 +91,7 @@ class LoginPageState extends State<LoginPage> {
           //  For example:
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => HomeScreen(title: "Home")),
+            MaterialPageRoute(builder: (context) => HomeScreen(title: "Home", user: user)),
           );
         } else {
           _showMessage("Invalid Credentials", Color(0xFFC12222));
