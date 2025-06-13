@@ -30,7 +30,7 @@ class DatabaseHelper {
     // Open the database (or create it if it doesn't exist)
     return await openDatabase(
       path,
-      version: 2,
+      version: 3,
       onCreate: _onCreate,
       onUpgrade: _onUpgrade, // Handle database upgrades if schema changes
     );
@@ -43,6 +43,7 @@ class DatabaseHelper {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         username TEXT UNIQUE NOT NULL,
         password TEXT NOT NULL
+        role TEXT NOT NULL DEFAULT 'Driver'
       )
     ''');
     await db.execute('''
@@ -80,6 +81,15 @@ class DatabaseHelper {
         remarks TEXT,
         kilometersCovered REAL NOT NULL
       )
+      ''');
+
+    }
+    if (oldVersion < 3) {
+      await db.execute('''
+      ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'Driver';
+      ''');
+      await db.execute('''
+      UPDATE users SET role = 'Admin' WHERE id = 1;
       ''');
     }
   }
