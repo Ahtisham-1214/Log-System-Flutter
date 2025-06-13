@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:log_system/Model/log_repository.dart';
+import 'package:log_system/View/register_screen.dart';
+import 'package:log_system/main.dart';
 import 'add_log.dart';
 import 'view_log.dart';
 
@@ -54,6 +56,38 @@ class _HomeScreen extends State<HomeScreen> {
       appBar: AppBar(
         title: Text(widget.title),
         backgroundColor: Theme.of(context).primaryColor,
+        centerTitle: true,
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(color: Color(0xFF97160A)),
+              child: const Text(
+                'Navigation Menu',
+                style: TextStyle(color: Colors.white, fontSize: 24),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.person_add),
+              title: const Text('Register'),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const RegisterPage()));
+              },
+            ),
+
+            ListTile(
+              leading: const Icon(Icons.logout),
+              title: const Text('Logout'),
+              onTap: () {
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => MyApp()));
+              },
+            ),
+          ],
+        ),
       ),
       body: Center(
         child: _isLoading
