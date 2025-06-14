@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:log_system/Model/log.dart';
 import 'package:log_system/Model/log_repository.dart';
 import 'package:log_system/View/register_screen.dart';
 import 'package:log_system/main.dart';
@@ -189,6 +190,148 @@ class _HomeScreen extends State<HomeScreen> {
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size(double.infinity, 50),
                       ),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            icon: const Icon(Icons.bus_alert_rounded),
+                            label: const Text("Pick"),
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  final TextEditingController initialMeterReadingController =
+                                      TextEditingController();
+                                  return AlertDialog(
+                                    title: const Text("Enter Pick Details"),
+                                    content: TextField(
+                                      controller: initialMeterReadingController,
+                                      keyboardType:
+                                          TextInputType.numberWithOptions(
+                                            decimal: true,
+                                          ),
+                                      decoration: const InputDecoration(
+                                        hintText: "Enter Meter Reading",
+                                      ),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        child: const Text("Cancel"),
+                                        onPressed: () {
+                                          Navigator.of(
+                                            context,
+                                          ).pop(); // Close the popup
+                                        },
+                                      ),
+                                      ElevatedButton(
+                                        child: const Text("Submit"),
+                                        onPressed: () {
+                                          double input =
+                                              double.tryParse(
+                                                initialMeterReadingController.text,
+                                              ) ??
+                                              0.0;
+                                          try {
+                                            Log log = Log.pickLog(
+                                              name: widget.user.userName,
+                                              detail:
+                                                  'Picked student for the university',
+                                              purpose: "Picking",
+                                              date:
+                                                  "${DateTime.now().toLocal()}"
+                                                      .split(' ')[0],
+                                              timeFrom: TimeOfDay.now().format(
+                                                context,
+                                              ),
+                                              remarks: '',
+                                              initialMeterReading: input,
+                                            );
+                                            Navigator.pop(
+                                              context,
+                                            ); // Close the popup
+                                          } catch (e) {
+                                            showDialog(
+                                              context: context,
+                                              builder:
+                                                  (context) => AlertDialog(
+                                                    title: const Text('Error'),
+                                                    content: Text(e.toString()),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed:
+                                                            () => Navigator.pop(
+                                                              context,
+                                                            ),
+                                                        child: const Text('OK'),
+                                                      ),
+                                                    ],
+                                                  ),
+                                            );
+                                          }
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size(double.infinity, 50),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            icon: const Icon(Icons.bus_alert_rounded),
+                            label: const Text("Drop"),
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  final TextEditingController finalMeterReadingController =
+                                      TextEditingController();
+                                  return AlertDialog(
+                                    title: const Text("Enter Drop Details"),
+                                    content: TextField(
+                                      controller: finalMeterReadingController,
+                                      decoration: const InputDecoration(
+                                        hintText: "Enter Meter Reading",
+                                      ),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        child: const Text("Cancel"),
+                                        onPressed: () {
+                                          Navigator.of(
+                                            context,
+                                          ).pop(); // Close the popup
+                                        },
+                                      ),
+                                      ElevatedButton(
+                                        child: const Text("Submit"),
+                                        onPressed: () {
+                                          String input = finalMeterReadingController.text;
+                                          // You can handle the input here (e.g. save, validate, etc.)
+
+                                          Navigator.of(
+                                            context,
+                                          ).pop(); // Close the popup
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size(double.infinity, 50),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
