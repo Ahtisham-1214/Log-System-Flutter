@@ -36,6 +36,26 @@ class Log {
     this.kilometersCovered = kilometersCovered;
   }
 
+  Log.pickLog({
+    required String name,
+    required String detail,
+    required String purpose,
+    required String date,
+    required String timeFrom,
+    required String remarks,
+    required double initialMeterReading,
+  }) {
+    this.name = name;
+    this.detail = detail;
+    this.purpose = purpose;
+    this.date = date;
+    this.timeFrom = timeFrom;
+    this.remarks = remarks;
+    this.initialMeterReading = initialMeterReading;
+    this.finalMeterReading = initialMeterReading;
+    kilometersCovered = 0;
+  }
+
   String get name => _name;
 
   set name(String value) {
